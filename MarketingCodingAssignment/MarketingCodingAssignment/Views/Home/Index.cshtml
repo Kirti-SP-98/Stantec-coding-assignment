@@ -160,15 +160,13 @@
                 lines.push("<div class='panel panel-primary'>");
                 lines.push("<div class='panel-heading'><h3 class='panel-title'><a href='https://www.imdb.com/title/" + htmlEncode(item.id) + "'>" + htmlEncode(item.title) + "</a></h3></div>");
                 lines.push("<div class='panel-body'>");
-                if (item.tagline || item.runtime || item.revenue || item.voteAverage) {
+                if (item.tagline || item.runtime || item.revenue) {
                     lines.push("<div>");
                     if (item.tagline) lines.push("<span class='tagline'><em>" + item.tagline + "</em></span>");
                     if (item.tagline && (item.runtime || item.revenue)) lines.push(" | ");
                     if (item.runtime) lines.push("<span> " + item.runtime + " minutes</span>");
                     if (item.runtime && item.revenue) lines.push(" | ");
                     if (item.revenue) lines.push("<span>" + item.revenue.toLocaleString("en-US", { style: "currency", currency: "USD" }) + "</span>");
-                    if (item.voteAverage && (item.runtime || item.revenue)) lines.push(" | ");
-                    if (item.voteAverage) lines.push("<span>" + item.voteAverage + "/10 </span>");
                     lines.push("</div>");
                 }
 
