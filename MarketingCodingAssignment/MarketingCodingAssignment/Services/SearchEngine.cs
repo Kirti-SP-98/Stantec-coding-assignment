@@ -11,6 +11,8 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Lucene.Net.Analysis.En;
+using Microsoft.AspNetCore.Http;
+using static Lucene.Net.Util.Packed.PackedInt32s;
 
 namespace MarketingCodingAssignment.Services
 {
@@ -57,7 +59,8 @@ namespace MarketingCodingAssignment.Services
                 Runtime = int.TryParse(x.Runtime, out int parsedRuntime) ? parsedRuntime : 0,
                 Tagline = x.Tagline,
                 Revenue = long.TryParse(x.Revenue, out long parsedRevenue) ? parsedRevenue : 0,
-                VoteAverage = double.TryParse(x.VoteAverage, out double parsedVoteAverage) ? parsedVoteAverage : 0
+                VoteAverage = double.TryParse(x.VoteAverage, out double parsedVoteAverage) ? parsedVoteAverage : 0,
+                ReleaseDate = string.IsNullOrEmpty(x.ReleaseDate) ? null : DateTime.ParseExact(x.ReleaseDate, "yyyy-MM-ddTHH:mm:ss'Z'", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)
             }).ToList();
 
             // Write the records to the lucene index
@@ -92,7 +95,8 @@ namespace MarketingCodingAssignment.Services
                     new TextField("Tagline", film.Tagline, Field.Store.YES),
                     new Int64Field("Revenue", film.Revenue ?? 0, Field.Store.YES),
                     new DoubleField("VoteAverage", film.VoteAverage ?? 0.0, Field.Store.YES),
-                    new TextField("CombinedText", film.Title + " " + film.Tagline + " " + film.Overview, Field.Store.NO)
+                    new TextField("CombinedText", film.Title + " " + film.Tagline + " " + film.Overview, Field.Store.NO),
+                    new TextField("ReleaseDate", film.ReleaseDate.ToString() , Field.Store.YES)
                 };
                 writer.AddDocument(doc);
             }
@@ -149,11 +153,12 @@ namespace MarketingCodingAssignment.Services
                     Runtime = int.TryParse(foundDoc.Get("Runtime"), out int parsedRuntime) ? parsedRuntime : 0,
                     Tagline = foundDoc.Get("Tagline").ToString(),
                     Revenue = long.TryParse(foundDoc.Get("Revenue"), out long parsedRevenue) ? parsedRevenue : 0,
-                    VoteAverage =  double.TryParse(foundDoc.Get("VoteAverage"), out double parsedVoteAverage) ? parsedVoteAverage : 0.0,
-                    Score = hit.Score
+                    VoteAverage = double.TryParse(foundDoc.Get("VoteAverage"), out double parsedVoteAverage) ? parsedVoteAverage : 0.0,
+                    Score = hit.Score,
+                    ReleaseDate = string.IsNullOrEmpty(foundDoc.Get("ReleaseDate").ToString()) ? null : DateTime.Parse(foundDoc.Get("ReleaseDate").ToString())
                 };
 
-                //Add films based on the filters
+            //Add films based on the filters
                 if (film.VoteAverage >= voteAverageMinimum && film.Runtime >= durationMinimum && film.Runtime <= durationMaximum)
                 {
                     films.Add(film);

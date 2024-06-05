@@ -167,12 +167,11 @@
                     if (item.runtime) lines.push("<span> " + item.runtime + " minutes</span>");
                     if (item.runtime && item.revenue) lines.push(" | ");
                     if (item.revenue) lines.push("<span>" + item.revenue.toLocaleString("en-US", { style: "currency", currency: "USD" }) + "</span>");
-                    if (item.voteAverage && (item.runtime || item.revenue)) lines.push(" | ");
-                    if (item.voteAverage) lines.push("<span>" + item.voteAverage + "/10 </span>");
                     lines.push("</div>");
                 }
 
-                if (item.releaseDate) lines.push("<div>Initially released " + new Date(item.releaseDate).toLocaleDateString() + "</div>");
+                if(item.voteAverage) lines.push("<span>Rating : " + item.voteAverage + "/10 </span>");
+                if (item.releaseDate) lines.push("<div>Initially released : " + new Date(item.releaseDate).toLocaleDateString() + "</div>");
                 if (item.overview) lines.push("<div class='overview'>" + item.overview + "</div>");
                 lines.push("</div>");
                 lines.push("</div>");
