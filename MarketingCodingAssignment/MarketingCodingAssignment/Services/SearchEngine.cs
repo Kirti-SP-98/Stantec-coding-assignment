@@ -152,7 +152,12 @@ namespace MarketingCodingAssignment.Services
                     VoteAverage =  double.TryParse(foundDoc.Get("VoteAverage"), out double parsedVoteAverage) ? parsedVoteAverage : 0.0,
                     Score = hit.Score
                 };
-                films.Add(film);
+
+                //Add films based on the filters
+                if (film.VoteAverage >= voteAverageMinimum && film.Runtime >= durationMinimum && film.Runtime <= durationMaximum)
+                {
+                    films.Add(film);
+                }
             }
 
             SearchResultsViewModel searchResults = new()
