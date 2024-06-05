@@ -64,8 +64,38 @@
         }
 
         select{
-            margin: 5px;
+            margin: 7px;
         }
+
+        .display-4{
+            background: #2F3C7E;
+            color: white;
+            font-weight: bold;
+        }
+
+        .overview{
+            color: gray;
+            font-size: 12px;
+        }
+
+        #releaseDate{
+            color: dimgray;
+        }
+
+        #currency {
+            color: #FFBB00;
+            font-weight: bold;
+        }
+
+        #minutes{
+            color: midnightblue;
+            font-weight: bold;
+        }
+
+        #rating{
+            color: dimgray;
+        }
+
     </style>
 }
 
@@ -171,14 +201,14 @@
                     lines.push("<div>");
                     if (item.tagline) lines.push("<span class='tagline'><em>" + item.tagline + "</em></span>");
                     if (item.tagline && (item.runtime || item.revenue)) lines.push(" | ");
-                    if (item.runtime) lines.push("<span> " + item.runtime + " minutes</span>");
+                    if (item.runtime) lines.push("<span id='minutes'> " + item.runtime + " minutes</span>");
                     if (item.runtime && item.revenue) lines.push(" | ");
-                    if (item.revenue) lines.push("<span>" + item.revenue.toLocaleString("en-US", { style: "currency", currency: "USD" }) + "</span>");
+                    if (item.revenue) lines.push("<span id='currency'>" + item.revenue.toLocaleString("en-US", { style: "currency", currency: "USD" }) + "</span>");
                     lines.push("</div>");
                 }
 
-                if(item.voteAverage) lines.push("<span>Rating : " + item.voteAverage + "/10 </span>");
-                if (item.releaseDate) lines.push("<div>Initially released : " + new Date(item.releaseDate).toLocaleDateString() + "</div>");
+                if (item.voteAverage) lines.push("<span id='rating'><b>Rating : </b>" + item.voteAverage + "/10 </span>");
+                if (item.releaseDate) lines.push("<div id='releaseDate'><b>Initially released : </b>" + new Date(item.releaseDate).toLocaleDateString() + "</div>");
                 if (item.overview) lines.push("<div class='overview'>" + item.overview + "</div>");
                 lines.push("</div>");
                 lines.push("</div>");
@@ -277,7 +307,7 @@
         </div>
         <div style="display:inline-block;">
             <label for="releaseDateFacet">Release Date Range</label>
-            <select id="releaseDateFacet" class="form-control" style="display: block; width: 260px">
+            <select id="releaseDateFacet" class="form-control" style="display: block; width: 250px">
                 <option value="01/01/1994 - 01/01/1995">01/01/1994 - 01/01/1995</option>
                 <option value="01/01/1995 - 01/01/1996">01/01/1995 - 01/01/1996</option>
                 <option value="01/01/1996 - 01/01/1997">01/01/1996 - 01/01/1997</option>
