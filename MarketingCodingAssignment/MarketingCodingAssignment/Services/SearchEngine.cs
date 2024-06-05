@@ -121,7 +121,7 @@ namespace MarketingCodingAssignment.Services
             return;
         }
 
-        public SearchResultsViewModel Search(string searchString, int startPage, int rowsPerPage, int? durationMinimum, int? durationMaximum, double? voteAverageMinimum)
+        public SearchResultsViewModel Search(string searchString, int startPage, int rowsPerPage, int? durationMinimum, int? durationMaximum, double? voteAverageMinimum, string releaseDateRange)
         {
             // Construct a machine-independent path for the index
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
@@ -129,6 +129,10 @@ namespace MarketingCodingAssignment.Services
             using FSDirectory dir = FSDirectory.Open(indexPath);
             using DirectoryReader reader = DirectoryReader.Open(dir);
             IndexSearcher searcher = new(reader);
+            //Logic to get min and max date for release date
+            string[] releaseDates = releaseDateRange.Split();
+            DateTime minReleaseDate = DateTime.Parse(releaseDates[0]);
+            DateTime maxReleaseDate = DateTime.Parse(releaseDates[2]);
 
             int hitsLimit = 1000;
             TopScoreDocCollector collector = TopScoreDocCollector.Create(hitsLimit, true);
@@ -138,7 +142,7 @@ namespace MarketingCodingAssignment.Services
             searcher.Search(query, collector);
 
             int startIndex = (startPage) * rowsPerPage;
-            TopDocs hits = collector.GetTopDocs(startIndex, rowsPerPage);
+            TopDocs hits = collector.GetTopDocs(startIndex, 100); // taking 10 items per page using linq on line 166
             ScoreDoc[] scoreDocs = hits.ScoreDocs;
 
             List<FilmLuceneRecord> films = new();
@@ -157,18 +161,20 @@ namespace MarketingCodingAssignment.Services
                     Score = hit.Score,
                     ReleaseDate = string.IsNullOrEmpty(foundDoc.Get("ReleaseDate").ToString()) ? null : DateTime.Parse(foundDoc.Get("ReleaseDate").ToString())
                 };
-
-            //Add films based on the filters
-                if (film.VoteAverage >= voteAverageMinimum && film.Runtime >= durationMinimum && film.Runtime <= durationMaximum)
-                {
-                    films.Add(film);
-                }
+                films.Add(film);
             }
+
+            //Add films based on the filters 
+            List<FilmLuceneRecord> filmsList = films.Where(f => (f.VoteAverage >= voteAverageMinimum 
+                                                                && f.Runtime >= durationMinimum 
+                                                                && f.Runtime <= durationMaximum
+                                                                && f.ReleaseDate >= minReleaseDate
+                                                                && f.ReleaseDate <= maxReleaseDate)).Take(10).ToList();
 
             SearchResultsViewModel searchResults = new()
             {
                 RecordsCount = hits.TotalHits,
-                Films = films.ToList()
+                Films = filmsList
             };
 
             return searchResults;
